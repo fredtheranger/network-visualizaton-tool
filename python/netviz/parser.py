@@ -60,6 +60,7 @@ def parse(database, filename):
             #pkt.show()
             continue
             
+        print "\tprocessing pkt w/ timestamp %s, %s -> %s..." % ( packet["ts"], packet["src"][0], packet["dst"][0] )
         database.insert_packet(packet)
     
     print "Done parsing, here are some statistics: "

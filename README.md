@@ -3,7 +3,7 @@ network-visualizaton-tool
 
 Overview:
 
-Network forensics tool to parse pcap and provide visualizations using D3.js.
+Network forensics tool to parse pcap and provide visualizations using D3.js.  
 
 Pre-requisites:
 - Python 2.6+
