@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    
+    <style>
+	path { stroke: steelblue; stroke-width: 1; fill: none; }
+    .axis { shape-rendering: crispEdges; }
+    .x.axis line { stroke: lightgrey;}
+    .x.axis .minor { stroke-opacity: .5; }
+    .x.axis path { display: none;}
+    .y.axis line, .y.axis path { fill: none; stroke: #000; }
+	</style>
+    
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	
+</head>
+
+<body>
+
+    <h2>Traffic (measured in packets per second) over time</h2>
+    <div id="chart" class="aGraph" style="position:absolute;top:0px;left:0; float:left;"></div>	
+	
+	<script>
+	
+	var m = [ 80, 80, 80, 80 ];
+	var w = 1200 - m[1] - m[3];
+	var h = 400 - m[0] - m[2];
+	
+	d3.json("/service/timeline", function(data) {
+	    var x = d3.scale.linear()
+	        .domain([0, data.length])
+	        .range([0, w]);
+	    
+	    var y = d3.scale.linear()
+	        .domain([0, d3.max(data)])
+	        .range([h, 0]);
+	    
+	    var line = d3.svg.line()
+	        .x(function(d, i) { return x(i); })
+	        .y(function(d) { return y(d); })
+	        
+        var graph = d3.select("#chart").append("svg")
+            .attr("width", w + m[1] + m[3])
+            .attr("height", h + m[0] + m[2])
+            .append("g")
+            .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+            
+        var xAxis = d3.svg.axis().scale(x).tickSize(-h).tickSubdivide(true);
+        graph.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + h + ")")
+			.call(xAxis);
+			
+		var yAxisLeft = d3.svg.axis().scale(y).ticks(4).orient("left");
+		graph.append("g")
+		      .attr("class", "y axis")
+		      .attr("transform", "translate(-25,0)")
+		      .call(yAxisLeft);
+			
+  			
+		graph.append("path")
+		    .attr("d", line(data));
+	});
+	</script>
+	
+</body>
+</html>

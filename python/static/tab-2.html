@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+	
+</head>
+
+<body>
+
+    <div id="chart"><p><!--placeholder--></p></div>	
+	<div id="detail">
+	    <h2>The treemap shows the traffic as destination by source.<br>
+	    Each color represents a local source and each box represents<br>
+	    the destination.  Using the mouseover reveals the number of <br>
+	    packets in that flow as well.</h2>
+	    <p></p>
+	    
+	</div>
+	
+	<script>
+	
+	    function loadDetails(src, dst) {
+	        $.getJSON("/service/source/details/" + src + "/" + dst, function(data) {
+	            var table = "<table id='details'><thead>";
+	            table += "<tr><th>protocol</th><th>source</th><th>sport</th><th>destination</th><th>dport</th></tr></thead><tbody>";
+	            $.each(data, function(i, value) {
+	                table += "<tr><td>" + value[0] 
+	                    + "</td><td>" + value[1]
+	                    + "</td><td>" + value[2] 
+	                    + "</td><td>" + value[3]
+	                    + "</td><td>" + value[4]
+	                    + "</td></tr>";
+	            }); 
+	            $("#detail p").html("</tbody>" + table + "</table>");
+	            $("#details").dataTable();
+	        });   
+	    }
+	
+        var color = d3.scale.category20c();
+    
+        var canvas = d3.select("#chart").append("svg")
+            .attr("width", 750)
+            .attr("height", 500)
+        
+        d3.json("/service/sources", function(data) {
+            var treemap = d3.layout.treemap()
+                .size([750,500])
+                .nodes(data);
+       
+            var nodes = canvas.selectAll(".node")
+                .data(treemap)
+                .enter()
+                .append("g")
+                .on("click", function(d, i) { loadDetails(d.parent.name, d.name); })
+                .on("mouseover", function(d) {
+                    var info = d.parent.name 
+                            + " >>> " + d.name
+                            + " (" + d.value + " packets)";
+                    d3.select("#chart p").html(info) ;
+                })
+                .attr("class", "node");
+                
+            nodes.append("rect")
+                .attr("x", function(d) { return d.x; })
+                .attr("y", function(d) { return d.y; })
+                .attr("width", function(d) { return d.dx; })
+                .attr("height", function(d) { return d.dy; })
+                .attr("fill", function(d) { return d.children ? null : color(d.parent.name) })
+                .attr("cursor", "pointer")
+                .attr("stroke", "#fff"); 
+                
+            nodes.append("text")
+                .attr("x", function(d) { return d.x + d.dx / 2; })
+                .attr("y", function(d) { return d.y + d.dy / 2; })
+                .attr("text-anchor", "middle")
+                .attr("cursor", "pointer")
+                .text(function(d) { return d.name; });
+                
+        });
+    </script>
+
+</body>
+</html>

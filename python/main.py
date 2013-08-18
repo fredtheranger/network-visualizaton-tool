@@ -9,17 +9,19 @@ D3.js library.
 """
 
 from netviz import dao, parser, utils
+import web
 
 # parse the command line args
 args = utils.getargs()
 
 # initialize the database
-database = dao.DAO("sqlite.db")
-
+print "\nInitializing database..."
+database = dao.DAO("sqlite.db", True)
 
 # parse pcap into sqlite db
-parser.parse(database, args.pcap)
+print "\nParsing %s and inserting into database..." % args.pcap
+total = parser.parse(database, args.pcap)
 
-# generate json file(s)
+database.populate_info(args.pcap, args.network, total)
 
-# start python server to serve javascript application
+print "\nParsing and database population complete, you may start the server now."
