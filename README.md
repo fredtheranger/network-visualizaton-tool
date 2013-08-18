@@ -12,13 +12,15 @@ Pre-requisites:
 
 Import and parsing pcap file:
 
-
-- Usage: python python/main.py -n <local_network> <path_to_pcap>
-- Example: python python/main.py -n 192.168.1.0/24 /home/user/example.pcap
+- (from python directory)
+- Usage: python main.py -n <local_network> <path_to_pcap>
+- Example: python main.py -n 192.168.1.0/24 /home/user/example.pcap
 
 Viewing the results:
 
-- python python/server.py
+- (from python directory)
+- python server.py
+- open browser to: http://localhost:8080/static/index.html
 
 Resources used:
 
